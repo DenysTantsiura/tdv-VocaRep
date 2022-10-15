@@ -1,0 +1,339 @@
+# ...! cd d:\mysenv\scripts\ .\activate.ps1
+"""Vocabulary replenishment (Repetition of vocabulary) for learning a new language. Version 6.0.0
+
+
+cd d:\mysenv\scripts
+./activate
+
+......."""
+import os
+from random import shuffle
+
+
+FILE_OF_WORDS = 'EnWords.txt'
+FILE_OF_SCORES = 'EnWScores.txt'
+FILE_REPORT = 'Summary result.txt'
+
+
+def check_file(path_name_file: str) -> str:
+    """Checks if the file exists and checks if the filename is free if not.
+        Return unoccupied name of file.
+
+        Parameters:
+            path_name_file (str): Is proposed name of file
+
+        Returns:
+            path_name_file (str): Unoccupied name of file
+    """
+    if os.path.isdir(path_name_file):
+        while os.path.isdir(path_name_file):
+            path_name_file = 'new_one_' + path_name_file
+
+    return path_name_file
+
+
+def generate_report(_, vocabulary: dict, file_report: str, *_a) -> tuple:
+    """Generate the report file and save it.
+
+        Parameters:
+            vocabulary(dict): Vocabulary dictionary
+            file_report(str): Names(path) of file fo report
+
+        Returns:
+            tuple(True(bool),): True if all okay
+    """
+
+    with open(file_report, 'w', encoding='utf-8-sig') as report_file:
+        counter = 0
+        for word in vocabulary['words_language_1']:
+            line = f'''{word} - {vocabulary['words_language_2'][counter]}\n\t'''\
+                f'''=attempts: {vocabulary['total_test'][counter]},\n\t'''\
+                f'''successfully: {vocabulary['successful_results'][counter]}\n\n'''
+            report_file.write(line)
+            counter += 1
+
+        print(f'File "{file_report}" generated successfully.')
+
+    return True,
+
+
+def save_result(vocabulary: dict, file_scores: str) -> tuple:
+    """Write scores file. Return lists of words, scores.
+
+        Parameters:
+            vocabulary(dict): Vocabulary dictionary
+            file_scores(str): Names(path) of scores file
+
+        Returns:
+            tuple(True(bool),): True if all okay
+    """
+
+    with open(file_scores, 'w', encoding='utf-8-sig') as scores_file:
+        for counter, success in zip(vocabulary['total_test'], vocabulary['successful_results']):
+            line = f'{counter} {success}\n'
+            scores_file.write(line)
+
+        print(f'File "{file_scores}" saves successfully.')
+
+    return True,
+
+
+def shuffle_the_indexes(word_count: int) -> list:
+    """Shuffle the indexes of word list.
+
+        Parameters:
+            word_count (int): The number of words (len(words_list))
+
+        Returns:
+            Lisst of numers(indexes) in a mixed order
+    """
+    mix = [_ for _ in range(word_count)]
+    shuffle(mix)
+    shuffle(mix)
+
+    return mix
+
+
+# vocabulary['words_language_1'][current_word_index]
+def play_the_audio_hint(current_word: str) -> None:
+    """Play the audio hint for current word, if available."""
+    # whatch in folder 'language_audio_hints'('English' for example), find and play 'current_word'.mp3
+
+    pass
+
+
+def check_user_answer(message: str) -> str or bool:
+    """Get the user's answer and return it if it exists."""
+    print(message)
+    try:
+        user_answer = input()
+
+    except IOError as e:
+        errno, strerror = e.args
+        print('I/O error({0}): {1}'.format(errno, strerror))
+        return False
+
+    if not user_answer:
+        print('Unknown selection.\n')
+        return False
+
+    return user_answer
+
+
+def repetition(_, vocabulary: dict, file_report: str, file_scores: str, repetition_limit: int) -> tuple:
+    """Repetition...
+    ...!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    """
+    mixed_order = shuffle_the_indexes(len(vocabulary['words_language_1']))
+
+    while mixed_order:
+
+        current_word_index = mixed_order.pop(0)
+
+        if vocabulary['successful_results'][current_word_index] >= repetition_limit:
+            continue
+
+        elif vocabulary['total_test'][current_word_index] < 2:
+            pass  # PAF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+        user_answer = check_user_answer(
+            f'''\n{vocabulary['words_language_2'][current_word_index]}:''')
+
+        if user_answer == '4' or user_answer is False:
+            break
+
+        elif user_answer == vocabulary['words_language_1'][current_word_index]:
+            # PAF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            vocabulary['successful_results'][current_word_index] += 1
+            vocabulary['total_test'][current_word_index] += 1
+
+        else:
+            while user_answer != '4':
+                # PAF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                user_answer = check_user_answer(
+                    f'''Incorrect!, correct:\n {vocabulary['words_language_1'][current_word_index]}\nTry!:\n''')
+                if user_answer == vocabulary['words_language_1'][current_word_index]:
+                    # PAF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    print('Ok\n')
+                    break
+                # elif not user_answer: # is False
+                #     user_answer = '4' # or exit() ?
+            else:
+                print('I see it`s hard for you...\n')
+                break
+
+    save_result(vocabulary, file_scores)
+
+    return 'training results', vocabulary
+
+
+def set_a_repeat_limit(user_command: list, *_) -> tuple:
+    """Check a repetition limit for each word. Return the result for limitation.
+
+        Parameters:
+            user_command (list)
+
+        Returns:
+            True or False, and integer - limit
+    """
+    if len(user_command) > 1:
+        limit = user_command[1]
+
+    else:
+        print('No parameter entered. Limit set as 3.')
+        return 'set limit', 3
+
+    try:
+        limit = int(limit)
+
+    except ValueError:
+        print('Invalid limit. Must be an integer number between 1 and 100 (recomended 10).')
+        return 'Error', 0
+
+    if limit > 100 or limit < 1:
+        limit = 10
+        print('Limit must be between 1 and 100.')
+
+    print(f'Limit set as {limit}.')
+
+    return 'set limit', limit
+
+
+MAIN_MENU = {
+    '1': generate_report,
+    'generate': generate_report,
+    '2': repetition,
+    'continue': repetition,
+    '3': set_a_repeat_limit,
+    'set': set_a_repeat_limit,
+    '4': lambda *_: (None,),
+    'exit': lambda *_: (None,),
+}
+
+
+def check_user_command() -> list or bool:
+    """Get the user's choice and return it if it exists."""
+    try:
+        user_menu_selection = input('Enter your choice: ').lower().split(' ')
+
+    except IOError as e:
+        errno, strerror = e.args
+        print('I/O error({0}): {1}'.format(errno, strerror))
+        return False
+
+    if not user_menu_selection:
+        print('Unknown selection.\n')
+        return False
+
+    return user_menu_selection
+
+
+def create_a_vocabulary_dictionary(vocabulary: dict, vocabulary_file: str, scores_file: str) -> dict:
+    """Create a vocabulary dictionary from file of words. And return it."""
+    with open(vocabulary_file, encoding='utf-8-sig') as file_of_words:
+        for line in file_of_words:
+            if len(line) > 2:
+                line = line.rstrip().split(' - ')
+                vocabulary['words_language_1'].append(line[0])
+                vocabulary['words_language_2'].append(line[1])
+
+    word_count = len(vocabulary['words_language_1'])
+
+    if os.path.isfile(scores_file):
+        with open(scores_file, encoding='utf-8-sig') as file_of_scores:
+            for line in file_of_scores:
+                if len(line) > 2 and len(vocabulary['total_test']) < word_count:
+                    line = line.rstrip().split(' ')
+
+                    try:
+                        line[0] = int(line[0])
+                    except:
+                        line[0] = 0
+
+                    try:
+                        line[1] = int(line[1])
+                    except:
+                        line[1] = 0
+
+                    vocabulary['total_test'].append(line[0])
+                    vocabulary['successful_results'].append(line[1])
+
+    else:
+        vocabulary['total_test'] = [0 for _ in range(word_count)]
+        vocabulary['successful_results'] = [0 for _ in range(word_count)]
+
+    while len(vocabulary['total_test']) < word_count:
+        vocabulary['total_test'].append(0)
+        vocabulary['successful_results'].append(0)
+
+    return vocabulary
+
+
+def main():
+    """Vocabulary replenishment (Repetition of vocabulary) for learning a new language."""
+    vocabulary = {
+        'words_language_1': [],
+        'words_language_2': [],
+        'total_test': [],
+        'successful_results': [],
+    }
+
+    limit = 5  # default repetition limit for each word
+
+    name_file_words = check_file(FILE_OF_WORDS)
+
+    if not os.path.isfile(name_file_words):
+        input('The source word file was not found! \nEnter to exit...')
+        exit()
+
+    name_file_scores = check_file(FILE_OF_SCORES)
+    name_file_report = check_file(FILE_REPORT)
+    vocabulary = create_a_vocabulary_dictionary(
+        vocabulary, name_file_words, name_file_scores)
+
+    # PAF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+    while True:
+        print('Welcome to the simple program to vocabulary replenishment of any language(English) words...')
+        print('\nMenu: \n    1 - generate last results; \n    2 - continue learning; \
+            \n    3 - set reminder limit; \n    4 - exit;\n')
+
+        user_menu_selection = check_user_command()
+
+        if not isinstance(user_menu_selection, list):
+            continue
+
+        action = MAIN_MENU.get(user_menu_selection[0], None)
+
+        if not action:
+            print('Invalid command. Please try again.')
+            continue
+
+        result = action(user_menu_selection, vocabulary,
+                        name_file_report, name_file_scores, limit)
+
+        if result[0] == 'set limit':
+            limit = result[1]
+
+        elif result[0] == 'training results':
+            vocabulary = result[1]
+
+        elif result[0] is None:
+            print(' Bye! See you next time.')
+            break
+
+
+if __name__ == '__main__':
+    exit(main())
+
+
+"""
+Create the file if it does not exist. 
+
+
+ if not os.path.isfile(path_name_file):
+        print("Free-fill file ({path_name_file}) will be created...")
+        with open(path_name_file, 'w', encoding='utf-8-sig') as file:
+            print("File ({path_name_file}) created.")
+
+"""
