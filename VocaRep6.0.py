@@ -1,18 +1,22 @@
 # ...! cd d:\mysenv\scripts\ .\activate.ps1
-"""Vocabulary replenishment (Repetition of vocabulary) for learning a new language. Version 6.0.0
+"""Vocabulary replenishment (Repetition of vocabulary) for learning a new language. Version 6.0.2
 
 
 cd d:\mysenv\scripts
 ./activate
 
 ......."""
+# from itertools import repeat
 import os
 from random import shuffle
+from subprocess import call
+import time
 
 
 FILE_OF_WORDS = 'EnWords.txt'
 FILE_OF_SCORES = 'EnWScores.txt'
 FILE_REPORT = 'Summary result.txt'
+AUDIO_FILE_CATEGORIES = ['', '_1', '_2', '_3', ]
 
 
 def check_file(path_name_file: str) -> str:
@@ -37,7 +41,7 @@ def generate_report(_, vocabulary: dict, file_report: str, *_a) -> tuple:
 
         Parameters:
             vocabulary(dict): Vocabulary dictionary
-            file_report(str): Names(path) of file fo report
+            file_report(str): Names(path) of file of report
 
         Returns:
             tuple(True(bool),): True if all okay
@@ -94,15 +98,28 @@ def shuffle_the_indexes(word_count: int) -> list:
     return mix
 
 
-# vocabulary['words_language_1'][current_word_index]
 def play_the_audio_hint(current_word: str) -> None:
-    """Play the audio hint for current word, if available."""
-    # whatch in folder 'language_audio_hints'('English' for example), find and play 'current_word'.mp3
+    """Play the audio hint for current word twice, if available.
+        Needs: from subprocess import call.
 
-    pass
+        Parameters:
+            current_word(str): Vocabulary word in 1st language.
+            # watch in folder 'language_audio_hints'('English' for example), find and play 'current_word'.mp3
+
+        Returns:
+            None
+    """
+    if not os.path.isfile(f'C:\\Program Files\\VideoLAN\VLC\\vlc.exe'):
+        return
+
+    for sound_mark in AUDIO_FILE_CATEGORIES:
+        if os.path.isfile(f'English\\{current_word}{sound_mark}.mp3'):
+            for _ in range(2):
+                call(['C:\\Program Files\\VideoLAN\VLC\\vlc', '--play-and-exit',
+                     f'English\\{current_word}{sound_mark}.mp3'])
 
 
-def check_user_answer(message: str) -> str or bool:
+def get_user_answer(message: str) -> str or bool:
     """Get the user's answer and return it if it exists."""
     print(message)
     try:
@@ -120,11 +137,61 @@ def check_user_answer(message: str) -> str or bool:
     return user_answer
 
 
+def check_user_answer(current_word: str, user_answer: str) -> bool:
+    """Checking the correct spelling current word, with audio prompts if available.
+        If the first letter of the word (phrase) is in upper case, then it is 
+        necessary to adhere to the input case.
+
+        Parameters:
+            current_word(str): current word in language-1.
+            user_answer(str): user answer in language-1.
+
+        Returns:
+            verdict: True or False of user response.
+    """
+    if current_word[0].isupper() and user_answer == current_word:
+        verdict = True
+
+    elif user_answer.lower() == current_word.lower():
+        verdict = True
+
+    else:
+        verdict = False
+
+    play_the_audio_hint(current_word)
+
+    return verdict
+
+
+def calculate_the_time(start_time, end_time) -> time:
+    """Calculate the time interval. Return value."""
+    time_delta = end_time - start_time
+    if time_delta < 60:
+        return f'{int(time_delta)}s'
+    elif time_delta < 60 * 60:
+        return f'{time_delta//60}m {int(time_delta%60)}s'
+    elif time_delta < 60 * 60 * 24:
+        return f'{time_delta//3600}h {int(time_delta%3600)}m'
+    else:
+        return 'Are you alive?'
+
+
 def repetition(_, vocabulary: dict, file_report: str, file_scores: str, repetition_limit: int) -> tuple:
-    """Repetition...
-    ...!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    """Checking the correct spelling of each word in mix order, with audio prompts if available.
+        And saves results in memory and scores file. 
+
+        Parameters:
+            vocabulary(dict): Vocabulary dictionary
+            file_report(str): Names(path) of file of report (Not needed at the moment)
+            file_scores(str): Names(path) of file of scores to fix the results in file.
+            repetition_limit(int): for limitation of training repetition.
+
+        Returns:
+            tuple('training results', vocabulary): to fix the results in memory.
     """
     mixed_order = shuffle_the_indexes(len(vocabulary['words_language_1']))
+
+    start_repetition = time.time()
 
     while mixed_order:
 
@@ -134,33 +201,37 @@ def repetition(_, vocabulary: dict, file_report: str, file_scores: str, repetiti
             continue
 
         elif vocabulary['total_test'][current_word_index] < 2:
-            pass  # PAF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            play_the_audio_hint(
+                vocabulary['words_language_1'][current_word_index])
 
-        user_answer = check_user_answer(
+        user_answer = get_user_answer(
             f'''\n{vocabulary['words_language_2'][current_word_index]}:''')
 
         if user_answer == '4' or user_answer is False:
             break
 
-        elif user_answer == vocabulary['words_language_1'][current_word_index]:
-            # PAF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        elif check_user_answer(vocabulary['words_language_1'][current_word_index], user_answer):
             vocabulary['successful_results'][current_word_index] += 1
             vocabulary['total_test'][current_word_index] += 1
 
         else:
             while user_answer != '4':
-                # PAF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                user_answer = check_user_answer(
+
+                play_the_audio_hint(
+                    vocabulary['words_language_1'][current_word_index])
+                user_answer = get_user_answer(
                     f'''Incorrect!, correct:\n {vocabulary['words_language_1'][current_word_index]}\nTry!:\n''')
-                if user_answer == vocabulary['words_language_1'][current_word_index]:
-                    # PAF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+                if check_user_answer(vocabulary['words_language_1'][current_word_index], user_answer):
                     print('Ok\n')
                     break
-                # elif not user_answer: # is False
-                #     user_answer = '4' # or exit() ?
+
             else:
                 print('I see it`s hard for you...\n')
                 break
+
+    print('The training took:', calculate_the_time(
+        start_repetition, time.time()))
 
     save_result(vocabulary, file_scores)
 
@@ -211,7 +282,7 @@ MAIN_MENU = {
 }
 
 
-def check_user_command() -> list or bool:
+def get_user_command() -> list or bool:
     """Get the user's choice and return it if it exists."""
     try:
         user_menu_selection = input('Enter your choice: ').lower().split(' ')
@@ -298,7 +369,7 @@ def main():
         print('\nMenu: \n    1 - generate last results; \n    2 - continue learning; \
             \n    3 - set reminder limit; \n    4 - exit;\n')
 
-        user_menu_selection = check_user_command()
+        user_menu_selection = get_user_command()
 
         if not isinstance(user_menu_selection, list):
             continue
@@ -325,15 +396,3 @@ def main():
 
 if __name__ == '__main__':
     exit(main())
-
-
-"""
-Create the file if it does not exist. 
-
-
- if not os.path.isfile(path_name_file):
-        print("Free-fill file ({path_name_file}) will be created...")
-        with open(path_name_file, 'w', encoding='utf-8-sig') as file:
-            print("File ({path_name_file}) created.")
-
-"""
