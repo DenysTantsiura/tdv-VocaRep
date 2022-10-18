@@ -1,5 +1,5 @@
 # ...! cd d:\mysenv\scripts\ .\activate.ps1
-"""Vocabulary replenishment (Repetition of vocabulary) for learning a new language. Version 6.2.0
+"""Vocabulary replenishment (Repetition of vocabulary) for learning a new language. Version 6.2.1
 
 
 cd d:\mysenv\scripts
@@ -98,8 +98,8 @@ def shuffle_the_indexes(word_count: int) -> list:
     return mix
 
 
-def play_the_audio_hint(current_word: str) -> None:
-    """Play the audio hint for current word twice, if available.
+def play_the_audio_hint(current_word: str, repetitions: int = 1) -> None:
+    """Play the audio hint few("repetitions") times for current word, if available.
         Needs: from subprocess import call.
 
         Parameters:
@@ -114,7 +114,7 @@ def play_the_audio_hint(current_word: str) -> None:
 
     for sound_mark in AUDIO_FILE_CATEGORIES:
         if os.path.isfile(f'English\\{current_word}{sound_mark}.mp3'):
-            for _ in range(2):
+            for _ in range(repetitions):
                 call(['C:\\Program Files\\VideoLAN\VLC\\vlc', '--play-and-exit',
                      f'English\\{current_word}{sound_mark}.mp3'])
 
@@ -141,6 +141,7 @@ def check_user_answer(current_word: str, user_answer: str) -> bool:
     """Checking the correct spelling current word, with audio prompts if available.
         If the first letter of the word (phrase) is in upper case, then it is 
         necessary to adhere to the input case.
+        Additionally, if "r" is entered(s) - an audio-hint is played if its available.
 
         Parameters:
             current_word(str): current word in language-1.
@@ -162,7 +163,7 @@ def check_user_answer(current_word: str, user_answer: str) -> bool:
     else:
         verdict = False
 
-    play_the_audio_hint(current_word)
+    play_the_audio_hint(current_word, 2)
 
     return verdict
 
@@ -173,9 +174,9 @@ def calculate_the_time(start_time, end_time) -> time:
     if time_delta < 60:
         return f'{int(time_delta)}s'
     elif time_delta < 60 * 60:
-        return f'{time_delta//60}m {int(time_delta%60)}s'
+        return f'{int(time_delta//60)}m {int(time_delta%60)}s'
     elif time_delta < 60 * 60 * 24:
-        return f'{time_delta//3600}h {int(time_delta%3600)}m'
+        return f'{int(time_delta//3600)}h {int(time_delta%3600)}m'
     else:
         return 'Are you alive?'
 
