@@ -1,5 +1,5 @@
 # ...! cd d:\mysenv\scripts\ .\activate.ps1
-"""Vocabulary replenishment (Repetition of vocabulary) for learning a new language. Version 6.0.2
+"""Vocabulary replenishment (Repetition of vocabulary) for learning a new language. Version 6.2.0
 
 
 cd d:\mysenv\scripts
@@ -121,7 +121,7 @@ def play_the_audio_hint(current_word: str) -> None:
 
 def get_user_answer(message: str) -> str or bool:
     """Get the user's answer and return it if it exists."""
-    print(message)
+    print(message) if message else None
     try:
         user_answer = input()
 
@@ -149,6 +149,10 @@ def check_user_answer(current_word: str, user_answer: str) -> bool:
         Returns:
             verdict: True or False of user response.
     """
+    while user_answer == 'r':
+        play_the_audio_hint(current_word)
+        user_answer = get_user_answer('')
+
     if current_word[0].isupper() and user_answer == current_word:
         verdict = True
 
@@ -190,6 +194,9 @@ def repetition(_, vocabulary: dict, file_report: str, file_scores: str, repetiti
             tuple('training results', vocabulary): to fix the results in memory.
     """
     mixed_order = shuffle_the_indexes(len(vocabulary['words_language_1']))
+
+    print('Okay, let\'s start.')
+    print('Enter "r" to repeat audio-hint.')
 
     start_repetition = time.time()
 
