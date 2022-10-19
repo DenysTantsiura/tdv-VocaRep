@@ -16,7 +16,15 @@ import time
 FILE_OF_WORDS = 'EnWords.txt'
 FILE_OF_SCORES = 'EnWScores.txt'
 FILE_REPORT = 'Summary result.txt'
+
 AUDIO_FILE_CATEGORIES = ['', '_1', '_2', '_3', ]
+
+BEGINNING = 'Okay, let\'s do it!'
+FAREWELL = 'Bye! See you next time.'
+GIVE_UP = 'I see it\'s hard for you...'
+GREETING = 'Welcome!'
+INVALIDE_COMMAND = 'Invalid command. Please try again.'
+MISTAKE = 'Incorrect!'
 
 
 def check_file(path_name_file: str) -> str:
@@ -363,7 +371,7 @@ def main():
 
     if not os.path.isfile(name_file_words):
         input('The source word file was not found! \nEnter to exit...')
-        exit()
+        quit()
 
     name_file_scores = check_file(FILE_OF_SCORES)
     name_file_report = check_file(FILE_REPORT)
@@ -398,9 +406,10 @@ def main():
             vocabulary = result[1]
 
         elif result[0] is None:
-            print(' Bye! See you next time.')
+            print(FAREWELL)
+            play_the_audio_hint(FAREWELL)
             break
 
 
 if __name__ == '__main__':
-    exit(main())
+    main()
