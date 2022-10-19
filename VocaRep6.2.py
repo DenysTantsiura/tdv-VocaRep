@@ -1,5 +1,5 @@
 # ...! cd d:\mysenv\scripts\ .\activate.ps1
-"""Vocabulary replenishment (Repetition of vocabulary) for learning a new language. Version 6.2.1
+"""Vocabulary replenishment (Repetition of vocabulary) for learning a new language. Version 6.2.3
 
 
 cd d:\mysenv\scripts
@@ -169,6 +169,8 @@ def check_user_answer(current_word: str, user_answer: str) -> bool:
         verdict = True
 
     else:
+        play_the_audio_hint(MISTAKE)
+        time.sleep(2)
         verdict = False
 
     play_the_audio_hint(current_word, 2)
@@ -205,6 +207,7 @@ def repetition(_, vocabulary: dict, file_report: str, file_scores: str, repetiti
     mixed_order = shuffle_the_indexes(len(vocabulary['words_language_1']))
 
     print('Okay, let\'s start.')
+    play_the_audio_hint(BEGINNING)
     print('Enter "r" to repeat audio-hint.')
 
     start_repetition = time.time()
@@ -243,7 +246,8 @@ def repetition(_, vocabulary: dict, file_report: str, file_scores: str, repetiti
                     break
 
             else:
-                print('I see it`s hard for you...\n')
+                print(f'{GIVE_UP}\n')
+                play_the_audio_hint(GIVE_UP)
                 break
 
     print('The training took:', calculate_the_time(
@@ -380,6 +384,7 @@ def main():
 
     # PAF!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
+    play_the_audio_hint(GREETING)
     while True:
         print('Welcome to the simple program to vocabulary replenishment of any language(English) words...')
         print('\nMenu: \n    1 - generate last results; \n    2 - continue learning; \
@@ -393,7 +398,8 @@ def main():
         action = MAIN_MENU.get(user_menu_selection[0], None)
 
         if not action:
-            print('Invalid command. Please try again.')
+            print(INVALIDE_COMMAND)
+            play_the_audio_hint(INVALIDE_COMMAND)
             continue
 
         result = action(user_menu_selection, vocabulary,
