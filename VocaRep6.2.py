@@ -9,6 +9,7 @@ cd d:\mysenv\scripts
 # from itertools import repeat
 import os
 from random import shuffle
+import requests
 from subprocess import call
 import time
 
@@ -106,13 +107,63 @@ def shuffle_the_indexes(word_count: int) -> list:
     return mix
 
 
+def audio_hint_downloader(word: str, folder: str = 'English', language: str = 'en') -> bool:
+    """
+        Download the pronunciation of word (current_word) from a file in a certain language from
+        Google Translate (GT) and save in audio file (.mp3).
+
+        Parameters:
+            word(str): Current word in certain language.
+            folder(str): Directory(with path) for saving downloaded audio files. By default 'English'.
+            language(str): language marking in the request. By default 'en'.
+                (en - English; fr - French; es - Spanish;...)
+
+        Returns:
+            True or False, as a result of downloading and save it.
+        """
+
+    GOOGLE_WAY = 'https://translate.google.com/translate_tts?ie=UTF-&&client=tw-ob&tl='
+    complete_link = f'{GOOGLE_WAY}{language}&q={word}'
+
+    try:
+        response = requests.get(complete_link)
+    except requests.exceptions.HTTPError as errh:
+        print("Http Error:", errh)
+    except requests.exceptions.ConnectionError as errc:
+        print("Error Connecting:", errc)
+    except requests.exceptions.Timeout as errt:
+        print("Timeout Error:", errt)
+    except requests.exceptions.RequestException as err:
+        print("OOps: Something Else when trying download.", err)
+
+    if not response:
+        return False
+
+    try:
+        if folder:
+            open(f'{folder}\\{word}.mp3', 'wb').write(
+                response.content)  # need fixing '\\'
+        else:
+            open(f'{word}.mp3', 'wb').write(response.content)
+    except IOError as pc_error:
+        print(f'Sorry, but a hardware error has occurred'
+              f'({pc_error}) while writing the file: {word}.mp3')
+        return False
+    except Exception as err:
+        print("OOps: Something Else when trying save audio file.", err)
+        return False
+
+    return True
+
+
 def play_the_audio_hint(current_word: str, repetitions: int = 1) -> None:
     """Play the audio hint few("repetitions") times for current word, if available.
         Needs: from subprocess import call.
 
         Parameters:
             current_word(str): Vocabulary word in 1st language.
-            # watch in folder 'language_audio_hints'('English' for example), find and play 'current_word'.mp3
+            # watch in folder 'language_audio_hints'('English' for example), 
+            # find and play 'current_word'.mp3
 
         Returns:
             None
@@ -125,6 +176,9 @@ def play_the_audio_hint(current_word: str, repetitions: int = 1) -> None:
             for _ in range(repetitions):
                 call(['C:\\Program Files\\VideoLAN\VLC\\vlc', '--play-and-exit',
                      f'English\\{current_word}{sound_mark}.mp3'])
+        elif sound_mark == AUDIO_FILE_CATEGORIES[0]:
+            play_the_audio_hint(current_word) if audio_hint_downloader(
+                current_word) else None
 
 
 def get_user_answer(message: str) -> str or bool:
@@ -240,6 +294,9 @@ def repetition(_, vocabulary: dict, file_report: str, file_scores: str, repetiti
                     vocabulary['words_language_1'][current_word_index])
                 user_answer = get_user_answer(
                     f'''Incorrect!, correct:\n {vocabulary['words_language_1'][current_word_index]}\nTry!:\n''')
+
+                if user_answer == '4':
+                    continue
 
                 if check_user_answer(vocabulary['words_language_1'][current_word_index], user_answer):
                     print('Ok\n')
