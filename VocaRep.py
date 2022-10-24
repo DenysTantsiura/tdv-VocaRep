@@ -1,5 +1,5 @@
 # ...! cd d:\mysenv\scripts\ .\activate.ps1
-"""Vocabulary replenishment (Repetition of vocabulary) for learning a new language. Version 6.2.3
+"""Vocabulary replenishment (Repetition of vocabulary) for learning a new language. Version 6.3.0
 
 
 cd d:\mysenv\scripts

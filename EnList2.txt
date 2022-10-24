@@ -1,0 +1,6 @@
+﻿Welcome!
+Okay, let's do it!
+Bye! See you next time.
+Invalid command. Please try again.
+I see it's hard for you...
+Incorrect!
