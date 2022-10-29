@@ -1,5 +1,5 @@
 # ...! cd d:\mysenv\scripts\ .\activate.ps1
-"""Vocabulary replenishment (Repetition of vocabulary) for learning a new language. Version 6.3.0
+"""Vocabulary replenishment (Repetition of vocabulary) for learning a new language. Version 6.3.1
 
 
 cd d:\mysenv\scripts
@@ -277,6 +277,8 @@ def repetition(_, vocabulary: dict, file_report: str, file_scores: str, repetiti
             play_the_audio_hint(
                 vocabulary['words_language_1'][current_word_index])
 
+        vocabulary['total_test'][current_word_index] += 1
+
         user_answer = get_user_answer(
             f'''\n{vocabulary['words_language_2'][current_word_index]}:''')
 
@@ -285,7 +287,7 @@ def repetition(_, vocabulary: dict, file_report: str, file_scores: str, repetiti
 
         elif check_user_answer(vocabulary['words_language_1'][current_word_index], user_answer):
             vocabulary['successful_results'][current_word_index] += 1
-            vocabulary['total_test'][current_word_index] += 1
+            # vocabulary['total_test'][current_word_index] += 1
 
         else:
             while user_answer != '4':
