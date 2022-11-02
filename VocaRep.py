@@ -224,10 +224,10 @@ def check_user_answer(current_word: str, user_answer: str) -> bool:
 
     else:
         play_the_audio_hint(MISTAKE)
-        time.sleep(2)
+        time.sleep(1.6)
         verdict = False
 
-    play_the_audio_hint(current_word, 2)
+    play_the_audio_hint(current_word, list(repeat)[0])  # 2 old
 
     return verdict
 
@@ -349,6 +349,8 @@ def set_a_repeat_limit(user_command: list, *_) -> tuple:
     return 'set limit', limit
 
 
+repeat = {1}
+
 MAIN_MENU = {
     '1': generate_report,
     'generate': generate_report,
@@ -358,6 +360,7 @@ MAIN_MENU = {
     'set': set_a_repeat_limit,
     '4': lambda *_: (None,),
     'exit': lambda *_: (None,),
+    '5': lambda *_: (True, repeat.symmetric_difference_update(b if (b := repeat.copy()).add(int(input('\nEnter the audio-hint repeat(1, 2, or 3): '))) is None else b))
 }
 
 
