@@ -1,9 +1,5 @@
 # ...! cd d:\mysenv\scripts\ .\activate.ps1
-"""Vocabulary replenishment (Repetition of vocabulary) for learning a new language. Version 6.3.1
-
-
-cd d:\mysenv\scripts
-./activate
+"""Vocabulary replenishment (Repetition of vocabulary) for learning a new language. Version 6.3.2
 
 ......."""
 # from itertools import repeat
@@ -13,6 +9,8 @@ import requests
 from subprocess import call
 import time
 
+
+DEFAULT_LIMIT = 10
 
 FILE_OF_WORDS = 'EnWords.txt'
 FILE_OF_SCORES = 'EnWScores.txt'
@@ -126,7 +124,7 @@ def audio_hint_downloader(word: str, folder: str = 'English', language: str = 'e
     complete_link = f'{GOOGLE_WAY}{language}&q={word}'
 
     try:
-        response = requests.get(complete_link)
+        response = requests.get(complete_link) or None
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:
@@ -135,6 +133,9 @@ def audio_hint_downloader(word: str, folder: str = 'English', language: str = 'e
         print("Timeout Error:", errt)
     except requests.exceptions.RequestException as err:
         print("OOps: Something Else when trying download.", err)
+    else:
+        if 'response' not in locals():
+            return False
 
     if not response:
         return False
@@ -431,7 +432,7 @@ def main():
         'successful_results': [],
     }
 
-    limit = 5  # default repetition limit for each word
+    limit = DEFAULT_LIMIT  # default repetition limit for each word
 
     name_file_words = check_file(FILE_OF_WORDS)
 
@@ -450,7 +451,7 @@ def main():
     while True:
         print('Welcome to the simple program to vocabulary replenishment of any language(English) words...')
         print('\nMenu: \n    1 - generate last results; \n    2 - continue learning; \
-            \n    3 - set reminder limit; \n    4 - exit;\n')
+            \n    3 - set reminder limit; \n    4 - exit;\n    5 - set repetition audio-hint.\n')
 
         user_menu_selection = get_user_command()
 
