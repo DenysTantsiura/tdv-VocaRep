@@ -123,8 +123,9 @@ def audio_hint_downloader(word: str, folder: str = 'English', language: str = 'e
     GOOGLE_WAY = 'https://translate.google.com/translate_tts?ie=UTF-&&client=tw-ob&tl='
     complete_link = f'{GOOGLE_WAY}{language}&q={word}'
 
+    # response = None
     try:
-        response = requests.get(complete_link) or None
+        response = requests.get(complete_link)
     except requests.exceptions.HTTPError as errh:
         print("Http Error:", errh)
     except requests.exceptions.ConnectionError as errc:
@@ -133,12 +134,9 @@ def audio_hint_downloader(word: str, folder: str = 'English', language: str = 'e
         print("Timeout Error:", errt)
     except requests.exceptions.RequestException as err:
         print("OOps: Something Else when trying download.", err)
-    else:
-        if 'response' not in locals():
+    
+    if 'response' not in locals() or not response:
             return False
-
-    if not response:
-        return False
 
     try:
         if folder:
