@@ -1,5 +1,5 @@
 # ...! cd d:\mysenv\scripts\ .\activate.ps1
-"""Vocabulary replenishment (Repetition of vocabulary) for learning a new language. Version 6.3.2
+"""Vocabulary replenishment (Repetition of vocabulary) for learning a new language. Version 6.3.2.2
 
 ......."""
 # from itertools import repeat
@@ -123,7 +123,7 @@ def audio_hint_downloader(word: str, folder: str = 'English', language: str = 'e
     GOOGLE_WAY = 'https://translate.google.com/translate_tts?ie=UTF-&&client=tw-ob&tl='
     complete_link = f'{GOOGLE_WAY}{language}&q={word}'
 
-    # response = None
+    response = None
     try:
         response = requests.get(complete_link)
     except requests.exceptions.HTTPError as errh:
@@ -135,7 +135,7 @@ def audio_hint_downloader(word: str, folder: str = 'English', language: str = 'e
     except requests.exceptions.RequestException as err:
         print("OOps: Something Else when trying download.", err)
     
-    if 'response' not in locals() or not response:
+    if not response:  # if 'response' not in locals() or not response:
             return False
 
     try:
