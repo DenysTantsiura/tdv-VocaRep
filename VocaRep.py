@@ -31,10 +31,10 @@ def check_file(path_name_file: str) -> str:
         Return unoccupied name of file.
 
         Parameters:
-            path_name_file (str): Is proposed name of file
+            path_name_file (str): Is proposed name of file.
 
         Returns:
-            path_name_file (str): Unoccupied name of file
+            path_name_file (str): Unoccupied name of file.
     """
     if os.path.isdir(path_name_file):
         while os.path.isdir(path_name_file):
@@ -47,11 +47,11 @@ def generate_report(_, vocabulary: dict, file_report: str, *_a) -> tuple:
     """Generate the report file and save it.
 
         Parameters:
-            vocabulary(dict): Vocabulary dictionary
-            file_report(str): Names(path) of file of report
+            vocabulary(dict): Vocabulary dictionary.
+            file_report(str): Names(path) of file of report.
 
         Returns:
-            tuple(True(bool),): True if all okay
+            tuple(True(bool),): True if all okay.
     """
 
     with open(file_report, 'w', encoding='utf-8-sig') as report_file:
@@ -72,11 +72,11 @@ def save_result(vocabulary: dict, file_scores: str) -> tuple:
     """Write scores file. Return lists of words, scores.
 
         Parameters:
-            vocabulary(dict): Vocabulary dictionary
-            file_scores(str): Names(path) of scores file
+            vocabulary(dict): Vocabulary dictionary.
+            file_scores(str): Names(path) of scores file.
 
         Returns:
-            tuple(True(bool),): True if all okay
+            tuple(True(bool),): True if all okay.
     """
 
     with open(file_scores, 'w', encoding='utf-8-sig') as scores_file:
@@ -93,10 +93,10 @@ def shuffle_the_indexes(word_count: int) -> list:
     """Shuffle the indexes of word list.
 
         Parameters:
-            word_count (int): The number of words (len(words_list))
+            word_count (int): The number of words (len(words_list)).
 
         Returns:
-            Lisst of numers(indexes) in a mixed order
+            Lisst of numers(indexes) in a mixed order.
     """
     mix = [_ for _ in range(word_count)]
     shuffle(mix)
@@ -114,7 +114,7 @@ def audio_hint_downloader(word: str, folder: str = 'English', language: str = 'e
             word(str): Current word in certain language.
             folder(str): Directory(with path) for saving downloaded audio files. By default 'English'.
             language(str): language marking in the request. By default 'en'.
-                (en - English; fr - French; es - Spanish;...)
+                (en - English; fr - French; es - Spanish;...).
 
         Returns:
             True or False, as a result of downloading and save it.
@@ -165,7 +165,7 @@ def play_the_audio_hint(current_word: str, repetitions: int = 1) -> None:
             # find and play 'current_word'.mp3
 
         Returns:
-            None
+            None.
     """
     if not os.path.isfile(f'C:\\Program Files\\VideoLAN\VLC\\vlc.exe'):
         return
@@ -249,8 +249,8 @@ def repetition(_, vocabulary: dict, file_report: str, file_scores: str, repetiti
         And saves results in memory and scores file. 
 
         Parameters:
-            vocabulary(dict): Vocabulary dictionary
-            file_report(str): Names(path) of file of report (Not needed at the moment)
+            vocabulary(dict): Vocabulary dictionary.
+            file_report(str): Names(path) of file of report (Not needed at the moment).
             file_scores(str): Names(path) of file of scores to fix the results in file.
             repetition_limit(int): for limitation of training repetition.
 
@@ -320,10 +320,10 @@ def set_a_repeat_limit(user_command: list, *_) -> tuple:
     """Check a repetition limit for each word. Return the result for limitation.
 
         Parameters:
-            user_command (list)
+            user_command (list).
 
         Returns:
-            True or False, and integer - limit
+            True or False, and integer - limit.
     """
     if len(user_command) > 1:
         limit = user_command[1]
