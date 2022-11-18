@@ -4,6 +4,7 @@
 ......."""
 # from itertools import repeat
 import os
+# from pathlib import Path
 from random import shuffle
 import requests
 from subprocess import call
@@ -140,8 +141,11 @@ def audio_hint_downloader(word: str, folder: str = 'English', language: str = 'e
 
     try:
         if folder:
-            open(f'{folder}\\{word}.mp3', 'wb').write(
-                response.content)  # need fixing '\\'
+            # Path('English').mkdir(exist_ok=True, parents=True)
+            # open(Path(folder).joinpath(f'{word}.mp3'), 'wb').write(response.content)
+            # os.mkdir(os.path.join(folder))
+            os.makedirs(os.fspath(folder), exist_ok=True)
+            open(os.path.join(folder, f'{word}.mp3'), 'wb').write(response.content)
         else:
             open(f'{word}.mp3', 'wb').write(response.content)
     except IOError as pc_error:
